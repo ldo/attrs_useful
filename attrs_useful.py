@@ -30,7 +30,9 @@ def setattrs(obj, *args, **kwargs) :
         raise TypeError("specify attrs via either sequence/dict or keyword args, not both")
     #end if
     if len(args) != 0 :
-        assert len(args) == 1, "only one additional non-keyword arg allowed"
+        if len(args) != 1 :
+            raise TypeError("only one additional non-keyword arg allowed")
+        #end if
         attrset = args[0]
         if type(attrset) in (list, tuple) :
             for arg in attrset :
