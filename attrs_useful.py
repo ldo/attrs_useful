@@ -2,7 +2,8 @@
 # This module defines routine to ease getting/setting lots of attributes
 # on an object at once.
 #
-# Written by Lawrence D'Oliveiro <ldo@geek-central.gen.nz>.
+# Copyright 2013, 2014 by Lawrence D'Oliveiro <ldo@geek-central.gen.nz>.
+# Licensed under CC-BY-SA <http://creativecommons.org/licenses/by-sa/4.0/>.
 #-
 
 def getattrs(obj, attrnames) :
@@ -16,16 +17,7 @@ def getattrs(obj, attrnames) :
         result
 #end getattrs
 
-def setattrs(obj, *args, **kwargs) :
-    "does bulk setting of attributes on obj. Call this in any of the following ways:\n" \
-    "\n" \
-    "    setattrs(obj, ((key, val), (key, val) ...))\n" \
-    "    setattrs(obj, {key : val, key : val ...})\n" \
-    "    setattrs(obj, key = val, key = val ...)\n" \
-    "\n" \
-    "in each case, “key” is the name of an attribute of the object, and “val” is the\n" \
-    "new value to assign to it. In the first two cases, the key must be a string; in the\n" \
-    "last case, it is an unquoted word as per usual Python keyword-argument syntax.\n"
+def _setattrs_common(obj, setattr, args, kwargs) :
     if (len(args) != 0) == (len(kwargs) != 0) :
         raise TypeError("specify attrs via either sequence/dict or keyword args, not both")
     #end if
@@ -51,7 +43,38 @@ def setattrs(obj, *args, **kwargs) :
             setattr(obj, attr, kwargs[attr])
         #end for
     #end if
+#end _setattrs_common
+
+def setattrs(obj, *args, **kwargs) :
+    "does bulk setting of attributes on obj. Call this in any of the following ways:\n" \
+    "\n" \
+    "    setattrs(obj, ((key, val), (key, val) ...))\n" \
+    "    setattrs(obj, {key : val, key : val ...})\n" \
+    "    setattrs(obj, key = val, key = val ...)\n" \
+    "\n" \
+    "in each case, “key” is the name of an attribute of the object, and “val” is the\n" \
+    "new value to assign to it. In the first two cases, the key must be a string; in the\n" \
+    "last case, it is an unquoted word as per usual Python keyword-argument syntax.\n"
+    _setattrs_common(obj, setattr, args, kwargs)
 #end setattrs
+
+def pushattrs(obj, *args, **kwargs) :
+    "similar to settatrs, but returns a dict mapping attribute names to previous values" \
+    " for all attributes which were set. This can be passed to popattrs/setattrs to" \
+    " restore the previous values."
+    prevattrs = {}
+    def pushattr(obj, key, val) :
+        prevattrs[key] = getattr(obj, key)
+        setattr(obj, key, val)
+    #end pushattr
+#begin pushattrs
+    _setattrs_common(obj, pushattr, args, kwargs)
+    return \
+        prevattrs
+#end pushattrs
+
+popattrs = setattrs
+  # alternative name for symmetry with pushattrs
 
 def delattrs(obj, attrnames, ignore_error = False) :
     "deletes the specified attributes from the specified object. attrnames must be\n" \
