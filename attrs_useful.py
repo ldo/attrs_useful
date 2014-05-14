@@ -1,6 +1,13 @@
 #+
 # This module defines routine to ease getting/setting lots of attributes
-# on an object at once.
+# on an object at once. Routines provided are:
+#
+# * getattrs -- bulk retrieving of attribute values
+# * setattrs -- bulk setting of attribute values (can be used with result returned from getattrs)
+# * pushattrs -- bulk setting of attribute values and saving of previous values
+# * popattrs -- restores attribute values changed by pushattrs (just another name for setattrs)
+#
+# See the docstrings for more details.
 #
 # Copyright 2013, 2014 by Lawrence D'Oliveiro <ldo@geek-central.gen.nz>.
 # Licensed under CC-BY-SA <http://creativecommons.org/licenses/by-sa/4.0/>.
@@ -18,6 +25,7 @@ def getattrs(obj, attrnames) :
 #end getattrs
 
 def _setattrs_common(obj, setattr, args, kwargs) :
+    # common code for both setattrs and pushattrs
     if (len(args) != 0) == (len(kwargs) != 0) :
         raise TypeError("specify attrs via either sequence/dict or keyword args, not both")
     #end if
