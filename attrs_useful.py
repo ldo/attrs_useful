@@ -6,6 +6,7 @@
 # * setattrs -- bulk setting of attribute values (can be used with result returned from getattrs)
 # * pushattrs -- bulk setting of attribute values and saving of previous values
 # * popattrs -- restores attribute values changed by pushattrs (just another name for setattrs)
+# * delattrs -- bulk deletion of attributes
 #
 # See the docstrings for more details.
 #
